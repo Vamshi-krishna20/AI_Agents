@@ -1,0 +1,186 @@
+{
+  "name": "My workflow 13025",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        -208
+      ],
+      "id": "1d715439-ba69-42da-958a-b22a32a985d3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://aibusiness.com/rss.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        -208
+      ],
+      "id": "693888f8-6128-4a37-9113-bb882e3e3f32",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -208
+      ],
+      "id": "cca9cff6-9ebc-4817-9f66-7a399f0f9796",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an AI news summarizer assistant. Analyze the news articles and create an email summary.  For each article: Create a headline in ALL CAPS Write a 2-3 sentence summary Include the article link  Format as: Subject: Today's AI News  Hi there,  Here's your AI news summary:  HEADLINE IN CAPS Summary of what happened and why it matters... Read more: [link]  Best regards, AI News Bot"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.8,
+      "position": [
+        160,
+        -208
+      ],
+      "id": "e13f2ce1-2ea3-487b-8570-bf4c58423677",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        16
+      ],
+      "id": "f8cdc6ff-e1a7-433e-a299-656df58740bd",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xeRMfj70nNnQO4sz",
+          "name": "Google Gemini(PaLM) Api account 5201"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "pambavamshikrishna@gmail.com",
+        "subject": "Todays news for you from your n8n workflow",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        -208
+      ],
+      "id": "4bf21c37-76de-4d90-8558-6b3999c911c7",
+      "name": "Send a message",
+      "webhookId": "20b26097-3bb8-444d-892c-6820195f7f93",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CBbPCEFWSKpqukfX",
+          "name": "Gmail account 1471"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b28f8775-7beb-4d41-b5f9-7a691e570616",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "969257b09ad2942bbaff2e2288304f4969030574d109cdeca05bf11f630884df"
+  },
+  "id": "2onc0s8cFZIASWi6",
+  "tags": []
+}
